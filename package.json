@@ -1,7 +1,7 @@
 {
   "name": "@jmrl23/redis-store",
   "description": "Redis store for cache-manager",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "main": "build/main.js",
   "author": "Jomariel Gaitera <gaiterajomariel@gmail.com>",
   "contributors": [
@@ -19,7 +19,6 @@
     "build": "tsc --build"
   },
   "devDependencies": {
-    "@swc/core": "^1.5.7",
     "@types/node": "^20.12.12",
     "cache-manager": "^5.5.2",
     "typescript": "^5.4.5"
