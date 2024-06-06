@@ -16,15 +16,23 @@ export default class RedisStore implements Store {
     return data;
   }
 
-  public async set<T>(key: string, value: T, ttl?: Seconds): Promise<void> {
+  public async set<T>(key: string, value: T, ttl?: number): Promise<void> {
     const data = JSON.stringify({ data: value } satisfies Data<T>);
 
     if (typeof ttl === 'undefined') {
-      await this.client.set(this.key(key), data);
+      if (!this.options.ttl) {
+        await this.client.set(this.key(key), data);
+      } else {
+        await this.client.set(this.key(key), data, {
+          PX: this.options.ttl,
+        });
+      }
       return;
     }
 
-    await this.client.setEx(this.key(key), ttl, data);
+    await this.client.set(this.key(key), data, {
+      PX: ttl,
+    });
   }
 
   async del(key: string): Promise<void> {
@@ -35,7 +43,7 @@ export default class RedisStore implements Store {
     await this.client.flushDb();
   }
 
-  async mset(entries: Array<[string, unknown]>, ttl?: Seconds): Promise<void> {
+  async mset(entries: Array<[string, unknown]>, ttl?: number): Promise<void> {
     await Promise.all(entries.map(([key, value]) => this.set(key, value, ttl)));
   }
 
@@ -52,9 +60,7 @@ export default class RedisStore implements Store {
   async keys(pattern: string = '*'): Promise<string[]> {
     const keys = await this.client.keys(this.key(pattern));
     const normalizedKeys = keys.map((key) =>
-      !this.options.keyPrefix
-        ? key
-        : key.slice(this.options.keyPrefix.length + 1),
+      !this.options.prefix ? key : key.slice(this.options.prefix.length + 1),
     );
 
     return normalizedKeys;
@@ -75,17 +81,16 @@ export default class RedisStore implements Store {
   }
 
   private key(value: string): string {
-    if (!this.options.keyPrefix) return value;
-    return `${this.options.keyPrefix}:${value}`;
+    if (!this.options.prefix) return value;
+    return `${this.options.prefix}:${value}`;
   }
 }
 
 export interface Options {
-  keyPrefix?: string;
+  prefix?: string;
+  ttl?: number;
 }
 
 interface Data<T> {
   data: T;
 }
-
-export type Seconds = number;

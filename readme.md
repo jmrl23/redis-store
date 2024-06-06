@@ -9,14 +9,11 @@ import { caching } from 'cache-manager';
 import redisStore from '@jmrl23/redis-store';
 
 async function main() {
-  const store = await redisStore(
-    {
-      /* redis config */
-    },
-    {
-      /* store config */
-    },
-  );
+  const store = await redisStore({
+    url: 'redis://',
+    prefix: 'example',
+    ttl: 0,
+  });
   const cache = await caching(store);
 
   await cache.set('message', 'Hello, World!');
@@ -25,8 +22,15 @@ async function main() {
 
   console.log(message); // Hello, World!
 
-  await cache.store.disconnect();
+  await store.disconnect();
 }
 
 void main();
 ```
+
+## Options
+
+| Key    | Description                     | Defaults  |
+| ------ | ------------------------------- | --------- |
+| prefix | prefix for keys                 | undefined |
+| ttl    | Time to Live, `0` is to disable | undefined |
