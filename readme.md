@@ -9,10 +9,11 @@ import { caching } from 'cache-manager';
 import redisStore from '@jmrl23/redis-store';
 
 async function main() {
+  const id = 'keyboard_cat';
   const store = await redisStore({
+    id,
     url: 'redis://',
-    prefix: 'example',
-    ttl: 0,
+    prefix: 'ExampleService',
   });
   const cache = await caching(store);
 
@@ -30,7 +31,8 @@ void main();
 
 ## Options
 
-| Key    | Description                     | Defaults  |
-| ------ | ------------------------------- | --------- |
-| prefix | prefix for keys                 | undefined |
-| ttl    | Time to Live, `0` is to disable | undefined |
+| Key    | Description                     | Type   | Required |
+| ------ | ------------------------------- | ------ | -------- |
+| id     | Store id                        | string | ✅       |
+| prefix | prefix for keys                 | string | ❎       |
+| ttl    | Time to Live, `0` is to disable | number | ❎       |

@@ -6,9 +6,9 @@ import {
 import RedisStore, { type Options } from './redis-store';
 
 export default async function redisStore(
-  options: RedisClientOptions & Options = {},
+  options: RedisClientOptions & Options & { id: string },
 ): Promise<RedisStore> {
-  const { prefix, ttl, ...rest } = options;
+  const { id, prefix, ttl, ...rest } = options;
   const redisClient = createClient(rest);
 
   await redisClient.connect();
@@ -17,6 +17,7 @@ export default async function redisStore(
   const redisStore = new RedisStore(
     redisClient as RedisClientType,
     storeOptions,
+    id,
   );
 
   return redisStore;
