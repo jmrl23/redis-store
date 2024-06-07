@@ -55,7 +55,7 @@ export default class RedisStore implements Store {
   }
 
   async mdel(...keys: string[]): Promise<void> {
-    await this.client.del(keys);
+    await Promise.all(keys.map((key) => this.del(key)));
   }
 
   async keys(pattern: string = '*'): Promise<string[]> {
