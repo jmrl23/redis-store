@@ -40,7 +40,8 @@ export default class RedisStore implements Store {
   }
 
   async reset(): Promise<void> {
-    await this.client.flushDb();
+    const keys = await this.keys();
+    await Promise.all(keys.map((key) => this.del(key)));
   }
 
   async mset(entries: Array<[string, unknown]>, ttl?: number): Promise<void> {
