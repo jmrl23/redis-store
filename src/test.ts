@@ -3,11 +3,9 @@ import redisStore from './main';
 import assert from 'node:assert';
 
 async function main() {
-  const id = 'keyboard_cat';
-  const store = await redisStore({
-    id,
+  const store = redisStore({
     url: 'redis://',
-    prefix: 'TestService',
+    prefix: 'Test',
   });
   const cache = await caching(store);
 

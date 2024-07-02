@@ -5,19 +5,18 @@ import {
 } from 'redis';
 import RedisStore, { type Options } from './redis-store';
 
-export default async function redisStore(
-  options: RedisClientOptions & Options & { id: string },
-): Promise<RedisStore> {
-  const { id, prefix, ttl, ...rest } = options;
-  const redisClient = createClient(rest);
-
-  await redisClient.connect();
-
+export default function redisStore(
+  options: RedisClientOptions & Options,
+): RedisStore {
+  const { prefix, ttl, ...redisClientOptions } = options;
   const storeOptions = { prefix, ttl };
+  const redisClient = createClient(redisClientOptions);
+
+  redisClient.connect();
+
   const redisStore = new RedisStore(
     redisClient as RedisClientType,
     storeOptions,
-    id,
   );
 
   return redisStore;

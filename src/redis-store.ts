@@ -1,16 +1,12 @@
 import type { Store } from 'cache-manager';
 import type { RedisClientType } from 'redis';
+import stringify from 'json-stringify-safe';
 
 export default class RedisStore implements Store {
   constructor(
     public readonly client: RedisClientType,
     private readonly options: Options,
-    private readonly id: string,
   ) {}
-
-  public getId(): string {
-    return this.id;
-  }
 
   public disconnect = this.client.disconnect.bind(this.client);
 
@@ -21,7 +17,7 @@ export default class RedisStore implements Store {
   }
 
   public async set<T>(key: string, value: T, ttl?: number): Promise<void> {
-    const data = JSON.stringify({ data: value } satisfies Data<T>);
+    const data = stringify({ _: value } satisfies Data<T>);
 
     if (typeof ttl === 'undefined') {
       if (!this.options.ttl) {
@@ -64,9 +60,7 @@ export default class RedisStore implements Store {
   async keys(pattern: string = '*'): Promise<string[]> {
     const keys = await this.client.keys(this.key(pattern));
     const normalizedKeys = keys.map((key) =>
-      !this.options.prefix
-        ? key.substring(this.id.length + 1)
-        : key.slice(this.id.length + this.options.prefix.length + 2),
+      !this.options.prefix ? key : key.slice(this.options.prefix.length + 1),
     );
     return normalizedKeys;
   }
@@ -79,13 +73,13 @@ export default class RedisStore implements Store {
   private static getValue<T>(value: string | null): T | undefined {
     if (value === null) return undefined;
     const data = JSON.parse(value) as Data<T>;
-    const result = data.data;
+    const result = data._;
     return result;
   }
 
   private key(value: string): string {
-    if (!this.options.prefix) return `${this.id}:${value}`;
-    return `${this.id}:${this.options.prefix}:${value}`;
+    if (!this.options.prefix) return `${value}`;
+    return `${this.options.prefix}:${value}`;
   }
 }
 
@@ -95,5 +89,5 @@ export interface Options {
 }
 
 interface Data<T> {
-  data: T;
+  _: T;
 }
