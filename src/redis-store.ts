@@ -1,8 +1,7 @@
-import type { Store } from 'cache-manager';
 import type { RedisClientType } from 'redis';
 import stringify from 'json-stringify-safe';
 
-export default class RedisStore implements Store {
+export default class RedisStore {
   constructor(
     public readonly client: RedisClientType,
     private readonly options: Options,

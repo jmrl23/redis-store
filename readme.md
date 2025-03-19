@@ -1,11 +1,10 @@
-# Cache Manager Redis Store
+# @jmrl23/redis-store
 
-Redis store for [Cache Manager](https://www.npmjs.com/package/cache-manager)
+Redis simplified wrapper
 
 ## Sample usage
 
 ```ts
-import { caching } from 'cache-manager';
 import redisStore from '@jmrl23/redis-store';
 
 async function main() {
@@ -13,13 +12,14 @@ async function main() {
     url: 'redis://',
     prefix: 'Example',
   });
-  const cache = await caching(store);
 
-  await cache.set('message', 'Hello, World!');
+  await store.set('message', 'Hello, World!');
 
-  const message = await cache.get<string>('message');
+  const message = await store.get<string>('message');
 
   console.log(message); // Hello, World!
+
+  await store.del('message');
 
   await store.disconnect();
 }
@@ -27,7 +27,7 @@ async function main() {
 void main();
 ```
 
-## Options
+## Additional Options
 
 | Key    | Description                     | Type    |
 | ------ | ------------------------------- | ------- |
